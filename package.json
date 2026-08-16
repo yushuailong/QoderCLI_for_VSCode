@@ -2,7 +2,7 @@
   "name": "qodercli-contextbridge",
   "displayName": "QoderCLI ContextBridge",
   "description": "Inject real-time VS Code editor context (active file, cursor, selection) into Qoder CLI sessions. Zero-config, zero-touch.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "yushuailong",
   "license": "MIT",
   "icon": "media/icon.png",
@@ -17,6 +17,9 @@
   "engines": {
     "vscode": "^1.85.0"
   },
+  "extensionKind": [
+    "workspace"
+  ],
   "activationEvents": [
     "onStartupFinished"
   ],

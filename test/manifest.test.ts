@@ -16,6 +16,7 @@ test("package.json: 命令/快捷键/profile 声明与扩展常量一致", async
   assert.equal(manifest.contributes.keybindings[0].mac, "cmd+alt+q");
   assert.equal(manifest.contributes.terminal.profiles[0].id, "qoder-cli");
   assert.equal(manifest.activationEvents.includes("onStartupFinished"), true);
+  assert.deepEqual(manifest.extensionKind, ["workspace"]);
 });
 
 test("package.json: 品牌化字段（name/displayName/icon）", async () => {

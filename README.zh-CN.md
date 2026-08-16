@@ -23,12 +23,15 @@
 - **未保存标记** — 文件有未保存修改时，注入头部会标注 `(unsaved)`
 - **同时列出所有打开文件** — 除活动文件外，注入内容还会列出所有已打开文件，让模型看到你的完整工作集
 - **多窗口安全** — 按会话工作目录（cwd）严格匹配所属 VSCode 窗口，多项目并行互不串扰
+- **支持 Remote-SSH** — 扩展运行在远程扩展宿主上，远程窗口同样能在当前终端启动 Qoder CLI 并注入上下文
 
 ## 前置要求
 
 - VSCode ≥ 1.85
 - Qoder CLI（位于 `PATH` 中，或设置 [`qoder.executablePath`](#配置)）
 - Node.js ≥ 18
+
+> Remote-SSH 场景：扩展运行在远程服务器上，`qoder` 与 `node` 需安装在**服务器**的 `PATH` 中。
 
 ## 安装
 
@@ -41,6 +44,15 @@
 1. 打开一个项目文件夹
 2. 四种打开方式任选：状态栏左侧的 **"Qoder"** 按钮（一键）、快捷键 `Cmd+Alt+Q`（Windows/Linux 为 `Ctrl+Shift+Q`）、终端面板 `+` 旁下拉选择 **"Qoder CLI"**、或命令面板选择 **"Qoder CLI: 打开终端"**
 3. 选中一段代码，在终端里直接问："我在看哪一行？"——回答应包含文件名与行号
+
+## 远程（SSH）使用
+
+扩展声明为 workspace 类型，在 Remote-SSH 窗口中运行于远程扩展宿主：
+
+1. 在 Remote-SSH 窗口打开扩展面板——本扩展位于"本地 – 已安装"下，带有 **"Install in SSH: \<host\>"** 按钮，点击一次（每台服务器仅需一次）
+2. Reload Window 后照常打开 Qoder CLI 终端——它会在当前窗口的远程终端中启动并加载 hook
+
+在 Remote-SSH 窗口内从 Marketplace 安装会自动装到远程，无需额外步骤。若在远程窗口点击 "Qoder CLI" 弹出**新的本地窗口**，说明扩展还运行在本地——先做第 1 步。
 
 ## 注入内容示例
 
@@ -94,6 +106,14 @@ Open files (3): src/lib/a.ts, src/lib/b.ts (unsaved), package.json
 
 - 检查 `terminal.integrated.defaultProfile.osx/windows/linux` 是否被设为 "Qoder CLI"，改回 zsh（或系统默认）即可
 
+**Remote-SSH 窗口里点击 "Qoder CLI" 弹出新窗口**
+
+- 扩展运行在了本地而非服务器上。在扩展面板对本扩展点击 **"Install in SSH: \<host\>"**，然后 Reload Window
+
+**Remote-SSH 窗口的终端下拉里没有 "Qoder CLI"**
+
+- 扩展尚未安装到远程主机——同样先在扩展面板点击 **"Install in SSH: \<host\>"**
+
 ## 已知限制
 
 - 若你自己配置过 `UserPromptSubmit` hook，在扩展启动的会话中会被本扩展的配置覆盖（其他事件类型不受影响）
@@ -102,6 +122,7 @@ Open files (3): src/lib/a.ts, src/lib/b.ts (unsaved), package.json
 - 窗口异常退出可能在注册表留下失效条目：无害（hook 自动跳过），卸载扩展即清除
 - 多窗口同时启动时理论上存在注册表并发写丢失更新（窗口重新获得焦点或 Reload 时自愈）
 - 本地 HTTP 服务仅绑定 127.0.0.1 并要求随机 token（尽力而为级防护，与同类方案一致）
+- 每台 Remote-SSH 服务器需一次性 **"Install in SSH: \<host\>"**，之后扩展才能在远程运行
 
 ## Roadmap
 

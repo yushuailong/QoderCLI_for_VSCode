@@ -23,12 +23,15 @@ Qoder CLI sessions running in the integrated terminal can't see your editor. Con
 - **Unsaved marker** — when the file has unsaved changes, the injected header is annotated `(unsaved)`
 - **Open files listed** — All open files are listed alongside the active one, so the agent sees your whole working set
 - **Multi-window safe** — sessions are strictly matched to the VS Code window whose workspace contains the session's cwd, so parallel projects never cross-talk
+- **Remote-SSH supported** — the extension runs on the remote extension host, so remote windows launch Qoder CLI in the current terminal with context injection working
 
 ## Requirements
 
 - VS Code ≥ 1.85
 - Qoder CLI (available on `PATH`, or set [`qoder.executablePath`](#configuration))
 - Node.js ≥ 18
+
+> Remote-SSH: the extension runs on the remote server, so `qoder` and `node` must be available on the **server's** `PATH`.
 
 ## Installation
 
@@ -41,6 +44,15 @@ Qoder CLI sessions running in the integrated terminal can't see your editor. Con
 1. Open a project folder
 2. Open a Qoder CLI terminal — any of the four ways: status bar **Qoder** button, `Cmd+Alt+Q` (`Ctrl+Shift+Q` on Windows/Linux), terminal `+` dropdown → **Qoder CLI**, or Command Palette → **Qoder CLI: 打开终端** (the command title is currently Chinese)
 3. Select some code in the editor and ask in the terminal *"which line am I looking at?"* — the answer includes your file and line numbers
+
+## Remote (SSH) usage
+
+The extension is declared workspace-kind, so in Remote-SSH windows it runs on the remote extension host:
+
+1. Open the Extensions view in your Remote-SSH window — the extension sits under "Local – Installed" with an **Install in SSH: \<host\>** button. Click it (once per server).
+2. Reload Window, then open the Qoder CLI terminal as usual — it starts in the remote terminal of the current window, hook loaded.
+
+Installing from the Marketplace while inside a Remote-SSH window installs to the remote automatically. If clicking "Qoder CLI" in a remote window opens a **new local window**, the extension is still running on the local side — do step 1 first.
 
 ## What gets injected
 
@@ -96,6 +108,14 @@ The extension starts a read-only HTTP endpoint on `127.0.0.1` and registers the 
 
 - Check whether `terminal.integrated.defaultProfile.osx/windows/linux` is set to "Qoder CLI" — change it back to `zsh` or the default profile
 
+**In a Remote-SSH window, clicking "Qoder CLI" opens a new window**
+
+- The extension is running on your local machine instead of the server. Click **Install in SSH: \<host\>** on this extension in the Extensions view, then Reload Window
+
+**"Qoder CLI" is missing from the terminal dropdown in a Remote-SSH window**
+
+- The extension hasn't been installed on the remote host yet — same fix: click **Install in SSH: \<host\>** in the Extensions view
+
 ## Known limitations
 
 - If you have configured your own `UserPromptSubmit` hook, it is overridden in sessions launched by this extension (other event types are unaffected)
@@ -104,6 +124,7 @@ The extension starts a read-only HTTP endpoint on `127.0.0.1` and registers the 
 - Abnormal window exits may leave stale entries in the registry: harmless (the hook skips them automatically), cleared on uninstall
 - When multiple windows start at the same time, a concurrent-write lost update in the registry is theoretically possible (self-heals when the window regains focus or after a reload)
 - The local HTTP server binds only to 127.0.0.1 and requires a random token (best-effort protection, on par with similar solutions)
+- Each Remote-SSH server needs a one-time **Install in SSH: \<host\>** before the extension runs there
 
 ## Roadmap
 
