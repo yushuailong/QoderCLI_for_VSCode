@@ -16,7 +16,7 @@ Qoder CLI sessions running in the integrated terminal can't see your editor. Con
 
 ## Features
 
-- **Four ways to open** — status bar **Qoder** button, `Cmd+Alt+Q` (`Ctrl+Shift+Q` on Windows/Linux), terminal `+` dropdown → **Qoder CLI**, or Command Palette → **Qoder CLI: 打开终端** (the command title is currently Chinese); triggering any of them again just focuses the existing terminal
+- **Four ways to open** — status bar **Qoder** button, `Cmd+Alt+Q` (`Ctrl+Shift+Q` on Windows/Linux), terminal `+` dropdown → **Qoder CLI**, or Command Palette → **Qoder CLI: Open Terminal**; triggering any of them again just focuses the existing terminal
 - **Zero-config** — install and go; the only setting is `qoder.executablePath`, needed only when `qoder` is not on `PATH` (auto-discovered there otherwise)
 - **Zero-touch** — never modifies `~/.qoder/settings.json` or any project file; uninstall and it's gone
 - **Real-time pull** — context is fetched from the editor at the instant each message is sent, so it is always current
@@ -42,7 +42,7 @@ Qoder CLI sessions running in the integrated terminal can't see your editor. Con
 ## Quick Start
 
 1. Open a project folder
-2. Open a Qoder CLI terminal — any of the four ways: status bar **Qoder** button, `Cmd+Alt+Q` (`Ctrl+Shift+Q` on Windows/Linux), terminal `+` dropdown → **Qoder CLI**, or Command Palette → **Qoder CLI: 打开终端** (the command title is currently Chinese)
+2. Open a Qoder CLI terminal — any of the four ways: status bar **Qoder** button, `Cmd+Alt+Q` (`Ctrl+Shift+Q` on Windows/Linux), terminal `+` dropdown → **Qoder CLI**, or Command Palette → **Qoder CLI: Open Terminal**
 3. Select some code in the editor and ask in the terminal *"which line am I looking at?"* — the answer includes your file and line numbers
 
 ## Remote (SSH) usage

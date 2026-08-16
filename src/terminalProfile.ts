@@ -18,13 +18,13 @@ async function resolveQoderPath(): Promise<string | undefined> {
 
 function warnMissingQoder(): void {
   vscode.window.showWarningMessage(
-    "Qoder CLI Editor Context: 未找到 qoder 可执行文件，请在设置中配置 qoder.executablePath"
+    "Qoder CLI Editor Context: qoder executable not found. Please configure qoder.executablePath in settings."
   );
 }
 
 function warnSettingsDeployFailed(): void {
   vscode.window.showWarningMessage(
-    "Qoder CLI Editor Context: 上下文功能部署失败（可能磁盘/权限问题），本终端暂无法注入编辑器上下文。请尝试 Reload Window 或重装扩展"
+    "Qoder CLI Editor Context: context feature deployment failed (possibly a disk/permission issue); this terminal cannot inject editor context. Try Reload Window or reinstalling the extension."
   );
 }
 

@@ -28,7 +28,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   );
   const statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 90);
   statusItem.text = "$(terminal) Qoder";
-  statusItem.tooltip = "打开 Qoder CLI 终端（自动注入编辑器上下文）";
+  statusItem.tooltip = "Open a Qoder CLI terminal (editor context injected automatically)";
   statusItem.command = QODER_OPEN_COMMAND;
   statusItem.show();
   context.subscriptions.push(statusItem);

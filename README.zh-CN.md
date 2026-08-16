@@ -16,7 +16,7 @@
 
 ## 特性
 
-- **四种打开方式** — 状态栏左侧 **"Qoder"** 按钮、快捷键 `Cmd+Alt+Q`（Windows/Linux 为 `Ctrl+Shift+Q`）、终端面板 `+` 下拉中的 **Qoder CLI**、命令面板中的 **"Qoder CLI: 打开终端"**；再次触发任一方式只会聚焦已有终端，不会重复新建
+- **四种打开方式** — 状态栏左侧 **"Qoder"** 按钮、快捷键 `Cmd+Alt+Q`（Windows/Linux 为 `Ctrl+Shift+Q`）、终端面板 `+` 下拉中的 **Qoder CLI**、命令面板中的 **"Qoder CLI: Open Terminal"**；再次触发任一方式只会聚焦已有终端，不会重复新建
 - **开箱即用** — 安装即用；唯一配置项 `qoder.executablePath`，仅在 `qoder` 不在 `PATH` 时需要设置（默认自动从 `PATH` 查找）
 - **零侵入** — 不修改 `~/.qoder/settings.json`，不修改任何项目文件；卸载扩展即完全消失
 - **实时拉取** — 上下文在每次发送消息的瞬间从编辑器读取，永远最新
@@ -42,7 +42,7 @@
 ## 快速开始
 
 1. 打开一个项目文件夹
-2. 四种打开方式任选：状态栏左侧的 **"Qoder"** 按钮（一键）、快捷键 `Cmd+Alt+Q`（Windows/Linux 为 `Ctrl+Shift+Q`）、终端面板 `+` 旁下拉选择 **"Qoder CLI"**、或命令面板选择 **"Qoder CLI: 打开终端"**
+2. 四种打开方式任选：状态栏左侧的 **"Qoder"** 按钮（一键）、快捷键 `Cmd+Alt+Q`（Windows/Linux 为 `Ctrl+Shift+Q`）、终端面板 `+` 旁下拉选择 **"Qoder CLI"**、或命令面板选择 **"Qoder CLI: Open Terminal"**
 3. 选中一段代码，在终端里直接问："我在看哪一行？"——回答应包含文件名与行号
 
 ## 远程（SSH）使用
