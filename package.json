@@ -1,0 +1,71 @@
+{
+  "name": "qodercli-contextbridge",
+  "displayName": "QoderCLI ContextBridge",
+  "description": "Inject real-time VS Code editor context (active file, cursor, selection) into Qoder CLI sessions. Zero-config, zero-touch.",
+  "version": "0.2.0",
+  "publisher": "yushuailong",
+  "license": "MIT",
+  "icon": "media/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yushuailong/QoderCLI_ContextBridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yushuailong/QoderCLI_ContextBridge/issues"
+  },
+  "homepage": "https://github.com/yushuailong/QoderCLI_ContextBridge#readme",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "terminal": {
+      "profiles": [
+        {
+          "id": "qoder-cli",
+          "title": "Qoder CLI",
+          "icon": "terminal"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "qoder-cli.openTerminal",
+        "title": "Qoder CLI: 打开终端"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "qoder-cli.openTerminal",
+        "key": "ctrl+shift+q",
+        "mac": "cmd+alt+q"
+      }
+    ],
+    "configuration": {
+      "title": "Qoder CLI Editor Context",
+      "properties": {
+        "qoder.executablePath": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "qoder 可执行文件的绝对路径。留空时自动从 `PATH` 查找。"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.js",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "package": "vsce package --allow-missing-repository"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/vscode": "1.85.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.8.0"
+  }
+}
