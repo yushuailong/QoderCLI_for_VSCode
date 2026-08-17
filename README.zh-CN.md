@@ -16,7 +16,7 @@
 
 ## 特性
 
-- **四种打开方式** — 状态栏左侧 **"Qoder"** 按钮、快捷键 `Cmd+Alt+Q`（Windows/Linux 为 `Ctrl+Shift+Q`）、终端面板 `+` 下拉中的 **Qoder CLI**、命令面板中的 **"Qoder CLI: Open Terminal"**；再次触发任一方式只会聚焦已有终端，不会重复新建
+- **四种打开方式** — 状态栏左侧 **"Qoder"** 按钮、快捷键 `Cmd+Alt+Q`（Windows/Linux 为 `Ctrl+Shift+Q`）、终端面板 `+` 下拉中的 **Qoder CLI**、命令面板中的 **"Qoder CLI: Open Terminal"**；每次触发都会新开一个终端（自动编号：Qoder CLI、Qoder CLI 2…），新终端自动聚焦
 - **开箱即用** — 安装即用；唯一配置项 `qoder.executablePath`，仅在 `qoder` 不在 `PATH` 时需要设置（默认自动从 `PATH` 查找）
 - **零侵入** — 不修改 `~/.qoder/settings.json`，不修改任何项目文件；卸载扩展即完全消失
 - **实时拉取** — 上下文在每次发送消息的瞬间从编辑器读取，永远最新
@@ -118,7 +118,6 @@ Open files (3): src/lib/a.ts, src/lib/b.ts (unsaved), package.json
 
 - 若你自己配置过 `UserPromptSubmit` hook，在扩展启动的会话中会被本扩展的配置覆盖（其他事件类型不受影响）
 - 上下文在发送消息的瞬间快照；会话中途切换编辑器后，需下一条消息才会反映新状态
-- 每个窗口同时只有一个 "Qoder CLI" 终端（再次点击会聚焦已有终端而非新建）
 - 窗口异常退出可能在注册表留下失效条目：无害（hook 自动跳过），卸载扩展即清除
 - 多窗口同时启动时理论上存在注册表并发写丢失更新（窗口重新获得焦点或 Reload 时自愈）
 - 本地 HTTP 服务仅绑定 127.0.0.1 并要求随机 token（尽力而为级防护，与同类方案一致）

@@ -4,8 +4,8 @@
 #   2. remote qoder-server (<server>:~/.qoder-server/extensions)
 # Run from the repo root:  sh scripts/deploy-test.sh [vsix]
 set -e
-VSIX="${1:-qodercli-contextbridge-0.3.3.vsix}"
-VER="0.3.3"
+VSIX="${1:-qodercli-contextbridge-0.3.4.vsix}"
+VER="0.3.4"
 ID="yushuailong.qodercli-contextbridge"
 HOST="server"
 
@@ -17,7 +17,7 @@ unzip -q "$VSIX" -d /tmp/cb-vsix-extract
 cp -R /tmp/cb-vsix-extract/extension "$LE/$ID-$VER"
 node -e '
 const fs = require("fs");
-const ver = "0.3.3", id = "yushuailong.qodercli-contextbridge";
+const ver = "0.3.4", id = "yushuailong.qodercli-contextbridge";
 const p = process.env.HOME + "/.qoder/extensions/extensions.json";
 const j = JSON.parse(fs.readFileSync(p, "utf8"));
 const dir = process.env.HOME + "/.qoder/extensions/" + id + "-" + ver;

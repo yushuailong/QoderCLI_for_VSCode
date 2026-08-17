@@ -1,12 +1,11 @@
 import * as vscode from "vscode";
 import { resolveQoderExecutable } from "./lib/resolveQoder.ts";
-
-const TERMINAL_NAME = "Qoder CLI";
+import { isQoderTerminalName, nextQoderTerminalName } from "./lib/terminalName.ts";
 
 export const OPEN_TERMINAL_COMMAND = "qoder-cli.openTerminal";
 
-function findExistingTerminal(): vscode.Terminal | undefined {
-  return vscode.window.terminals.find((t) => t.name === TERMINAL_NAME);
+function nextTerminalName(): string {
+  return nextQoderTerminalName(vscode.window.terminals.map((t) => t.name));
 }
 
 async function resolveQoderPath(): Promise<string | undefined> {
@@ -28,9 +27,13 @@ function warnSettingsDeployFailed(): void {
   );
 }
 
-function terminalOptions(settingsPath: string, qoderPath: string): vscode.TerminalOptions {
+function terminalOptions(
+  settingsPath: string,
+  qoderPath: string,
+  name: string
+): vscode.TerminalOptions {
   return {
-    name: TERMINAL_NAME,
+    name,
     location: vscode.TerminalLocation.Panel,
     cwd: vscode.workspace.workspaceFolders?.[0]?.uri.fsPath,
     shellPath: qoderPath,
@@ -46,11 +49,6 @@ export function registerQoderTerminalProfile(
     async provideTerminalProfile(
       _token: vscode.CancellationToken
     ): Promise<vscode.TerminalProfile | undefined> {
-      const existing = findExistingTerminal();
-      if (existing) {
-        existing.show();
-        return undefined;
-      }
       if (settingsPath === undefined) {
         warnSettingsDeployFailed();
         return undefined;
@@ -60,23 +58,18 @@ export function registerQoderTerminalProfile(
         warnMissingQoder();
         return undefined;
       }
-      return new vscode.TerminalProfile(terminalOptions(settingsPath, qoderPath));
+      return new vscode.TerminalProfile(terminalOptions(settingsPath, qoderPath, nextTerminalName()));
     },
   };
   context.subscriptions.push(vscode.window.registerTerminalProfileProvider("qoder-cli", provider));
   context.subscriptions.push(
     vscode.window.onDidOpenTerminal((terminal) => {
-      if (terminal.name === TERMINAL_NAME) terminal.show();
+      if (isQoderTerminalName(terminal.name)) terminal.show();
     })
   );
 }
 
 export async function openQoderTerminal(settingsPath: string | undefined): Promise<void> {
-  const existing = findExistingTerminal();
-  if (existing) {
-    existing.show();
-    return;
-  }
   if (settingsPath === undefined) {
     warnSettingsDeployFailed();
     return;
@@ -86,6 +79,8 @@ export async function openQoderTerminal(settingsPath: string | undefined): Promi
     warnMissingQoder();
     return;
   }
-  const terminal = vscode.window.createTerminal(terminalOptions(settingsPath, qoderPath));
+  const terminal = vscode.window.createTerminal(
+    terminalOptions(settingsPath, qoderPath, nextTerminalName())
+  );
   terminal.show();
 }

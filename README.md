@@ -16,7 +16,7 @@ Qoder CLI sessions running in the integrated terminal can't see your editor. Con
 
 ## Features
 
-- **Four ways to open** — status bar **Qoder** button, `Cmd+Alt+Q` (`Ctrl+Shift+Q` on Windows/Linux), terminal `+` dropdown → **Qoder CLI**, or Command Palette → **Qoder CLI: Open Terminal**; triggering any of them again just focuses the existing terminal
+- **Four ways to open** — status bar **Qoder** button, `Cmd+Alt+Q` (`Ctrl+Shift+Q` on Windows/Linux), terminal `+` dropdown → **Qoder CLI**, or Command Palette → **Qoder CLI: Open Terminal**; each trigger opens a new terminal (auto-numbered: Qoder CLI, Qoder CLI 2, …), and the new terminal is focused automatically
 - **Zero-config** — install and go; the only setting is `qoder.executablePath`, needed only when `qoder` is not on `PATH` (auto-discovered there otherwise)
 - **Zero-touch** — never modifies `~/.qoder/settings.json` or any project file; uninstall and it's gone
 - **Real-time pull** — context is fetched from the editor at the instant each message is sent, so it is always current
@@ -120,7 +120,6 @@ The extension starts a read-only HTTP endpoint on `127.0.0.1` and registers the 
 
 - If you have configured your own `UserPromptSubmit` hook, it is overridden in sessions launched by this extension (other event types are unaffected)
 - Context is snapshotted at the moment a message is sent; if you switch editors mid-session, the next message is the first to reflect the new state
-- Only one "Qoder CLI" terminal exists per window at a time (clicking again focuses the existing terminal instead of creating a new one)
 - Abnormal window exits may leave stale entries in the registry: harmless (the hook skips them automatically), cleared on uninstall
 - When multiple windows start at the same time, a concurrent-write lost update in the registry is theoretically possible (self-heals when the window regains focus or after a reload)
 - The local HTTP server binds only to 127.0.0.1 and requires a random token (best-effort protection, on par with similar solutions)
