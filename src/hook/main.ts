@@ -5,7 +5,9 @@ import { formatContext, type EditorContext } from "../lib/formatContext.ts";
 import { findWindowsForCwd, loadRegistry, type WindowEntry } from "../lib/windowRegistry.ts";
 
 const REGISTRY_FALLBACK = "__EDITOR_CONTEXT_REGISTRY__";
-const REQUEST_TIMEOUT_MS = 500;
+// 远程服务器上扩展宿主在会话刚启动时常常高负载（语言服务索引、终端创建等），
+// 500ms 内未应答会导致首条消息静默丢失上下文；放宽到 2s（hook 总预算 5s）。
+const REQUEST_TIMEOUT_MS = 2000;
 const MAX_RESPONSE_BYTES = 1024 * 1024;
 
 async function readStdin(): Promise<string> {
@@ -101,12 +103,26 @@ export async function main(): Promise<void> {
       cwd = (input as { cwd: string }).cwd;
     }
   } catch {}
-  const candidates = findWindowsForCwd(await loadRegistry(registryPath), cwd);
+  const registry = await loadRegistry(registryPath);
+  const candidates = findWindowsForCwd(registry, cwd);
+  const failures: string[] = [];
   for (const entry of candidates) {
-    const context = await fetchContext(entry).catch(() => undefined);
+    const context = await fetchContext(entry).catch((err: unknown) => {
+      failures.push(`[editor-context] window ${entry.windowId} (port ${entry.port}): ${err}`);
+      return undefined;
+    });
     if (context) {
       process.stdout.write(buildHookOutput(context));
       return;
+    }
+  }
+  if (process.env.EDITOR_CONTEXT_DEBUG) {
+    if (candidates.length === 0) {
+      process.stderr.write(
+        `[editor-context] no window matched cwd ${cwd}; registry ${registryPath} has ${registry.windows.length} window(s)\n`
+      );
+    } else if (failures.length > 0) {
+      process.stderr.write(failures.join("\n") + "\n");
     }
   }
 }

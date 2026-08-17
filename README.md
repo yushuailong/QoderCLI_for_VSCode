@@ -83,7 +83,7 @@ Decoded: the first line attributes the context to this extension; `Active:` is t
 └────────────────────────────┘        └─────────────────────────┘
 ```
 
-The extension starts a read-only HTTP endpoint on `127.0.0.1` and registers the window (workspace folders + port + random token) in its own storage. It launches qoder with `--settings <extension-managed file>` — a deep-merged, session-scoped config that adds a single `UserPromptSubmit` hook. On every message, the hook matches the session's cwd to the right window, fetches live editor state, and appends it as `additionalContext`. The hook runs with a 5 s timeout; each per-window fetch gives up after 500 ms and falls through to the next candidate window, and any failure degrades silently — your message is still sent, just without context.
+The extension starts a read-only HTTP endpoint on `127.0.0.1` and registers the window (workspace folders + port + random token) in its own storage. It launches qoder with `--settings <extension-managed file>` — a deep-merged, session-scoped config that adds a single `UserPromptSubmit` hook. On every message, the hook matches the session's cwd to the right window, fetches live editor state, and appends it as `additionalContext`. The hook runs with a 5 s timeout; each per-window fetch gives up after 2 s and falls through to the next candidate window, and any failure degrades silently — your message is still sent, just without context.
 
 ## Configuration
 

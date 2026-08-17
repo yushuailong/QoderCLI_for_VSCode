@@ -81,7 +81,7 @@ Open files (3): src/lib/a.ts, src/lib/b.ts (unsaved), package.json
 └────────────────────────────┘        └─────────────────────────┘
 ```
 
-扩展通过启动参数 `qoder --settings <扩展自管理配置>` 仅为该会话注入一个 `UserPromptSubmit` hook（深度合并，不影响你的其他配置）。hook 在你每次发送消息时实时请求扩展获取编辑器状态，并以 `additionalContext` 附加到提示中。hook 超时为 5 秒；单个窗口取数 500ms 超时后自动尝试下一个候选窗口；任何失败都静默降级——消息照常发送，只是没有上下文。
+扩展通过启动参数 `qoder --settings <扩展自管理配置>` 仅为该会话注入一个 `UserPromptSubmit` hook（深度合并，不影响你的其他配置）。hook 在你每次发送消息时实时请求扩展获取编辑器状态，并以 `additionalContext` 附加到提示中。hook 超时为 5 秒；单个窗口取数 2 秒超时后自动尝试下一个候选窗口；任何失败都静默降级——消息照常发送，只是没有上下文。
 
 ## 配置
 

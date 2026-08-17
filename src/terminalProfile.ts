@@ -64,6 +64,11 @@ export function registerQoderTerminalProfile(
     },
   };
   context.subscriptions.push(vscode.window.registerTerminalProfileProvider("qoder-cli", provider));
+  context.subscriptions.push(
+    vscode.window.onDidOpenTerminal((terminal) => {
+      if (terminal.name === TERMINAL_NAME) terminal.show();
+    })
+  );
 }
 
 export async function openQoderTerminal(settingsPath: string | undefined): Promise<void> {

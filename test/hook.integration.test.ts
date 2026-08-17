@@ -162,7 +162,7 @@ test("端口无服务（连接拒绝）: 无输出，退出码 0", async (t) => 
   assert.equal(stdout, "");
 });
 
-test("服务挂起不应答: 500ms 超时后无输出退出，且总耗时明显小于 3s", async (t) => {
+test("服务挂起不应答: 2000ms 超时后无输出退出，且总耗时明显小于 5s hook 预算", async (t) => {
   const mock = await startMock(() => {
     /* 故意不响应 */
   });
@@ -176,7 +176,7 @@ test("服务挂起不应答: 500ms 超时后无输出退出，且总耗时明显
   const elapsed = Date.now() - started;
   assert.equal(code, 0);
   assert.equal(stdout, "");
-  assert.ok(elapsed < 3000, `耗时 ${elapsed}ms`);
+  assert.ok(elapsed < 4000, `耗时 ${elapsed}ms`);
 });
 
 test("死端口旧条目在前: 跳过后从新条目拿到上下文", async (t) => {
@@ -242,7 +242,7 @@ test("200 但响应形状非法: 静默跳过，无输出", async (t) => {
   assert.equal(stdout, "");
 });
 
-test("滴流响应超过总时限: 静默放弃，总耗时 < 3s", async (t) => {
+test("滴流响应超过总时限: 静默放弃，总耗时 < 5s hook 预算", async (t) => {
   const mock = await startMock((req, res) => {
     res.writeHead(200, { "Content-Type": "application/json" });
     res.write('{"file":');
@@ -258,5 +258,5 @@ test("滴流响应超过总时限: 静默放弃，总耗时 < 3s", async (t) => 
   const { code, stdout } = await runHook({ cwd: "/Users/x/projA" }, { EDITOR_CONTEXT_REGISTRY: path });
   assert.equal(code, 0);
   assert.equal(stdout, "");
-  assert.ok(Date.now() - started < 3000);
+  assert.ok(Date.now() - started < 5000);
 });

@@ -30,6 +30,14 @@ async function isExecutableFile(path: string): Promise<boolean> {
   }
 }
 
+// 远程开发（Remote-SSH 等）会把 <home>/.vscode-server、.qoder-server 等
+// 目录下的 bin/remote-cli/qoder 前置到 PATH；那是转发回客户端的 CLI shim
+// （同 code CLI），用它启动会话会闪退并可能触发客户端开新窗口，必须跳过。
+function isRemoteCliShim(path: string): boolean {
+  const segments = path.split(/[\\/]+/);
+  return segments.includes("remote-cli") && segments.some((s) => s.endsWith("-server"));
+}
+
 export async function resolveQoderExecutable(
   configuredPath: string | undefined,
   env: NodeJS.ProcessEnv = process.env
@@ -49,6 +57,7 @@ export async function resolveQoderExecutable(
   for (const dir of dirs) {
     for (const name of executableCandidates(isWindows, env)) {
       const candidate = resolve(join(dir, name));
+      if (isRemoteCliShim(candidate)) continue;
       if (await isExecutableFile(candidate)) return candidate;
     }
   }
