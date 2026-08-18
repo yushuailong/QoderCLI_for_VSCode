@@ -5,8 +5,8 @@
 # Also removes the pre-rename identity (yushuailong.qodercli-contextbridge).
 # Run from the repo root:  sh scripts/deploy-test.sh [vsix]
 set -e
-VSIX="${1:-qodercli-for-vscode-0.4.0.vsix}"
-VER="0.4.0"
+VSIX="${1:-qodercli-for-vscode-0.4.1.vsix}"
+VER="0.4.1"
 ID="yushuailong.qodercli-for-vscode"
 OLD_ID="yushuailong.qodercli-contextbridge"
 HOST="server"
