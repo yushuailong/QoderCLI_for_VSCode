@@ -16,7 +16,7 @@ function mkCtx(overrides: Partial<EditorContext> = {}): EditorContext {
 
 test("归属行始终第一行", () => {
   assert.ok(
-    formatContext(mkCtx()).startsWith("[Editor context injected by QoderCLI ContextBridge]\n")
+    formatContext(mkCtx()).startsWith("[Editor context injected by QoderCLI for VS Code]\n")
   );
 });
 
@@ -52,7 +52,7 @@ test("完整示例: 目标格式逐行一致", () => {
   assert.equal(
     out,
     [
-      "[Editor context injected by QoderCLI ContextBridge]",
+      "[Editor context injected by QoderCLI for VS Code]",
       "Active: src/app.ts (unsaved) — cursor L42, selection L40-L45:",
       "```ts",
       "const a = 1;",

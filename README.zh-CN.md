@@ -1,8 +1,8 @@
-# QoderCLI ContextBridge
+# QoderCLI for VS Code
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-1.85%2B-blue.svg)](https://code.visualstudio.com)
-[![CI](https://github.com/yushuailong/QoderCLI_ContextBridge/actions/workflows/ci.yml/badge.svg)](https://github.com/yushuailong/QoderCLI_ContextBridge/actions/workflows/ci.yml)
+[![CI](https://github.com/yushuailong/QoderCLI_for_VSCode/actions/workflows/ci.yml/badge.svg)](https://github.com/yushuailong/QoderCLI_for_VSCode/actions/workflows/ci.yml)
 
 [English](README.md) | **简体中文**
 
@@ -12,7 +12,7 @@
 
 ## 为什么
 
-集成终端里的 Qoder CLI 会话看不见你的编辑器。ContextBridge 补上的正是这一块：它在你发出的每条 **Qoder CLI** 消息里自动注入编辑器上下文——自动附上"你正在看什么"，不用敲 `@file`，不用复制粘贴，不用截图。
+集成终端里的 Qoder CLI 会话看不见你的编辑器。QoderCLI for VS Code 补上的正是这一块：它在你发出的每条 **Qoder CLI** 消息里自动注入编辑器上下文——自动附上"你正在看什么"，不用敲 `@file`，不用复制粘贴，不用截图。
 
 ## 特性
 
@@ -59,7 +59,7 @@
 每条消息发送时，hook 会把如下块作为 `additionalContext` 附加到提示中（下为真实输出格式，如实展示）：
 
 ```text
-[Editor context injected by QoderCLI ContextBridge]
+[Editor context injected by QoderCLI for VS Code]
 Active: src/app.ts (unsaved) — cursor L42, selection L40-L45:
 ```ts
 const a = 1;

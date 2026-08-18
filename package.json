@@ -1,19 +1,19 @@
 {
-  "name": "qodercli-contextbridge",
-  "displayName": "QoderCLI ContextBridge",
+  "name": "qodercli-for-vscode",
+  "displayName": "QoderCLI for VS Code",
   "description": "Inject real-time VS Code editor context (active file, cursor, selection) into Qoder CLI sessions. Zero-config, zero-touch.",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "publisher": "yushuailong",
   "license": "MIT",
   "icon": "media/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yushuailong/QoderCLI_ContextBridge.git"
+    "url": "https://github.com/yushuailong/QoderCLI_for_VSCode.git"
   },
   "bugs": {
-    "url": "https://github.com/yushuailong/QoderCLI_ContextBridge/issues"
+    "url": "https://github.com/yushuailong/QoderCLI_for_VSCode/issues"
   },
-  "homepage": "https://github.com/yushuailong/QoderCLI_ContextBridge#readme",
+  "homepage": "https://github.com/yushuailong/QoderCLI_for_VSCode#readme",
   "engines": {
     "vscode": "^1.85.0"
   },

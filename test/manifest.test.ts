@@ -21,7 +21,7 @@ test("package.json: 命令/快捷键/profile 声明与扩展常量一致", async
 
 test("package.json: 品牌化字段（name/displayName/icon）", async () => {
   const manifest = JSON.parse(await readFile(join(REPO_ROOT, "package.json"), "utf8"));
-  assert.equal(manifest.name, "qodercli-contextbridge");
-  assert.equal(manifest.displayName, "QoderCLI ContextBridge");
+  assert.equal(manifest.name, "qodercli-for-vscode");
+  assert.equal(manifest.displayName, "QoderCLI for VS Code");
   assert.equal(manifest.icon, "media/icon.png");
 });

@@ -1,8 +1,8 @@
-# QoderCLI ContextBridge
+# QoderCLI for VS Code
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-1.85%2B-blue.svg)](https://code.visualstudio.com)
-[![CI](https://github.com/yushuailong/QoderCLI_ContextBridge/actions/workflows/ci.yml/badge.svg)](https://github.com/yushuailong/QoderCLI_ContextBridge/actions/workflows/ci.yml)
+[![CI](https://github.com/yushuailong/QoderCLI_for_VSCode/actions/workflows/ci.yml/badge.svg)](https://github.com/yushuailong/QoderCLI_for_VSCode/actions/workflows/ci.yml)
 
 **English** | [简体中文](README.zh-CN.md)
 
@@ -12,7 +12,7 @@
 
 ## Why
 
-Qoder CLI sessions running in the integrated terminal can't see your editor. ContextBridge fixes this: it injects editor context into every **Qoder CLI** message you send — automatically annotated with what you're looking at, no `@file` typing, no copy-paste, no screenshots.
+Qoder CLI sessions running in the integrated terminal can't see your editor. QoderCLI for VS Code fixes this: it injects editor context into every **Qoder CLI** message you send — automatically annotated with what you're looking at, no `@file` typing, no copy-paste, no screenshots.
 
 ## Features
 
@@ -59,7 +59,7 @@ Installing from the Marketplace while inside a Remote-SSH window installs to the
 On every message, the hook appends a block like this as `additionalContext` (reproduced exactly as produced):
 
 ```text
-[Editor context injected by QoderCLI ContextBridge]
+[Editor context injected by QoderCLI for VS Code]
 Active: src/app.ts (unsaved) — cursor L42, selection L40-L45:
 ```ts
 const a = 1;

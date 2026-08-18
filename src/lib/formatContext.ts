@@ -9,7 +9,7 @@ export interface EditorContext {
 
 const MAX_SELECTION_CHARS = 2000;
 const MAX_OPEN_FILES = 15;
-const ATTRIBUTION = "Editor context injected by QoderCLI ContextBridge";
+const ATTRIBUTION = "Editor context injected by QoderCLI for VS Code";
 
 const LANGUAGE_BY_EXTENSION: Record<string, string> = {
   ".ts": "ts", ".tsx": "tsx", ".js": "js", ".jsx": "jsx", ".mjs": "js", ".cjs": "js",

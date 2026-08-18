@@ -94,7 +94,7 @@ test("命中窗口且扩展返回200: 输出合法 hook JSON，含格式化上�
   const ctx = out.hookSpecificOutput;
   assert.equal(ctx.hookEventName, "UserPromptSubmit");
   assert.ok(ctx.additionalContext.includes("src/app.ts"));
-  assert.ok(ctx.additionalContext.includes("QoderCLI ContextBridge"));
+  assert.ok(ctx.additionalContext.includes("QoderCLI for VS Code"));
   assert.ok(ctx.additionalContext.includes("selection L40-L45"));
   assert.ok(ctx.additionalContext.includes("const a = 1;"));
   assert.ok(ctx.additionalContext.includes("src/lib/a.ts (unsaved)"));
