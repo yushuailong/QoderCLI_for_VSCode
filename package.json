@@ -1,7 +1,7 @@
 {
   "name": "qodercli-for-vscode",
   "displayName": "QoderCLI for VS Code",
-  "description": "Use Qoder CLI in the VS Code terminal — every message automatically carries your live editor context: active file, cursor line, selection, open files.",
+  "description": "Run the Qoder CLI coding agent in a VS Code terminal — it automatically sees your live editor context: active file, cursor line, selected code, and open files. No @file typing, no copy-paste.",
   "version": "0.4.1",
   "publisher": "yushuailong",
   "license": "MIT",
