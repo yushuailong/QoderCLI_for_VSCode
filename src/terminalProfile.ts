@@ -74,6 +74,11 @@ export async function openQoderTerminal(settingsPath: string | undefined): Promi
     warnSettingsDeployFailed();
     return;
   }
+  const existing = vscode.window.terminals.filter((t) => isQoderTerminalName(t.name));
+  if (existing.length > 0) {
+    existing[existing.length - 1].show();
+    return;
+  }
   const qoderPath = await resolveQoderPath();
   if (!qoderPath) {
     warnMissingQoder();

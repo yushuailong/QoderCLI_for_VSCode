@@ -27,7 +27,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.commands.registerCommand(QODER_OPEN_COMMAND, () => void openQoderTerminal(settingsPath))
   );
   const statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 90);
-  statusItem.text = "$(terminal) Qoder";
+  statusItem.text = "$(terminal) Qoder CLI";
   statusItem.tooltip = "Open a Qoder CLI terminal (editor context injected automatically)";
   statusItem.command = QODER_OPEN_COMMAND;
   statusItem.show();
