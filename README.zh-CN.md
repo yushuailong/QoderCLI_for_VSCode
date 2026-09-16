@@ -104,8 +104,8 @@ hook 用终端的工作目录匹配到对应的 VS Code 窗口（windows.json）
 1. 扩展激活时，在 `127.0.0.1` 的随机端口上启动一个极小的 HTTP 服务，用每窗口独立的
    随机 token 校验，只暴露一个只读路由 `GET /context`。
 2. 把该窗口的端口、token、工作区文件夹登记到扩展自己全局存储目录下的注册表文件里。
-3. 同时在那里写一份自己的 `qoder-settings.json`，注册 `UserPromptSubmit` hook，并以
-   `qoder --settings <该文件>` 启动终端。
+3. 同时在那里写一份自己的 `qoder-settings.json`，注册 `UserPromptSubmit` hook，并（默认）
+   以 `qoder --settings <该文件>` 启动终端（可自定义，见[自定义启动参数](#自定义启动参数)）。
 4. 你提交 prompt 时，Qoder CLI 会执行 hook。hook 根据终端的工作目录找到对应的 VS Code
    窗口，通过本机回环取到实时上下文，作为这条消息的附加上下文返回。
 
@@ -120,6 +120,41 @@ hook 用终端的工作目录匹配到对应的 VS Code 窗口（windows.json）
 | 配置项 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | `qoder.executablePath` | string | `""` | `qoder` 可执行文件的绝对路径。留空时从 `PATH` 自动查找。 |
+| `qoder.injectEditorContext` | boolean | `true` | 自动附加 `--settings <部署的 settings 文件>` 以注入编辑器上下文。CLI 版本不支持 `--settings` 或想加载自己的 settings 文件时关闭。 |
+| `qoder.launchArgs` | string[] | `[]` | 追加到启动命令末尾的额外参数（位于自动注入的参数之后）。支持 `${settingsPath}`、`${hookPath}` 变量。 |
+
+## 自定义启动参数
+
+默认情况下终端以 `qoder --settings <部署的 qoder-settings.json>` 启动。如果这不符合
+你的需求——想用自己维护的 settings 文件、追加别的参数，或 CLI 版本不接受 `--settings`——
+可以用 `qoder.launchArgs` 接管：
+
+```jsonc
+// 用户或工作区 settings.json
+{
+  // 裸启动，不自动注入 --settings
+  "qoder.injectEditorContext": false,
+  // ...然后自己拼命令行
+  "qoder.launchArgs": [
+    "--settings", "/home/me/.qoder/my-settings.json",
+    "--verbose"
+  ]
+}
+```
+
+- `qoder.launchArgs` 中的参数排在自动注入的参数**之后**。多数 CLI 对重复 flag 取最后一次
+  出现的值，因此你在其中写的 `--settings` 通常会生效；若你的 CLI 版本不接受重复 flag，
+  把 `qoder.injectEditorContext` 设为 `false` 即可完全跳过注入。
+- 每个参数里会展开 `${settingsPath}`（部署的 settings 文件）和 `${hookPath}`（部署的
+  hook 脚本）两个变量。例：`"qoder.launchArgs": ["--settings", "${settingsPath}"]`。
+- 每次启动终端时都会重新读取配置，改完即生效，无需重载窗口。
+
+### 把 hook 合并进你自己的 settings
+
+如果你用自己的 `--settings` 文件，把 hook 注册复制进去即可继续获得编辑器上下文。
+在命令面板执行 **Qoder CLI: Open Editor Context Settings File** 打开部署的
+`qoder-settings.json`，把其中 `hooks.UserPromptSubmit` 条目（执行
+`node "<hookPath>"` 的那段）合并进你的文件即可。
 
 ## 远程开发（Remote-SSH、容器、WSL）
 

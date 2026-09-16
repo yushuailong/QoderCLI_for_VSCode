@@ -38,6 +38,10 @@
       {
         "command": "qoder-cli.openTerminal",
         "title": "Qoder CLI: Open Terminal"
+      },
+      {
+        "command": "qoder-cli.openSettingsFile",
+        "title": "Qoder CLI: Open Editor Context Settings File"
       }
     ],
     "keybindings": [
@@ -54,6 +58,19 @@
           "type": "string",
           "default": "",
           "markdownDescription": "Absolute path to the qoder executable. When left empty, qoder is looked up automatically from `PATH`."
+        },
+        "qoder.injectEditorContext": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Automatically pass `--settings <deployed settings file>` when launching the Qoder CLI terminal so editor context is injected. Disable it if your CLI build does not support `--settings`, or if you want to load your own settings file via `#qoder.launchArgs#`. The deployed settings file (with the `UserPromptSubmit` hook) can be opened with the **Qoder CLI: Open Editor Context Settings File** command so you can merge the hook into your own settings."
+        },
+        "qoder.launchArgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "markdownDescription": "Extra arguments appended to the Qoder CLI launch command, after any automatically injected arguments. Many CLIs take the last occurrence of a repeated flag, so a `--settings` added here usually wins; if your CLI rejects duplicate flags, turn off `#qoder.injectEditorContext#`. Supported variables: `${settingsPath}` (deployed settings file) and `${hookPath}` (deployed hook script). Example: `[\"--settings\", \"${settingsPath}\", \"--verbose\"]`."
         }
       }
     }

@@ -1,8 +1,15 @@
 import * as vscode from "vscode";
+import {
+  buildQoderLaunchArgs,
+  sanitizeLaunchArgs,
+  type QoderLaunchOptions,
+} from "./lib/launchArgs.ts";
 import { resolveQoderExecutable } from "./lib/resolveQoder.ts";
 import { isQoderTerminalName, nextQoderTerminalName } from "./lib/terminalName.ts";
+import type { DeployedFiles } from "./setup.ts";
 
 export const OPEN_TERMINAL_COMMAND = "qoder-cli.openTerminal";
+export const OPEN_SETTINGS_FILE_COMMAND = "qoder-cli.openSettingsFile";
 
 function nextTerminalName(): string {
   return nextQoderTerminalName(vscode.window.terminals.map((t) => t.name));
@@ -27,8 +34,19 @@ function warnSettingsDeployFailed(): void {
   );
 }
 
+/* 每次启动时读取配置, 保证修改 launchArgs/injectEditorContext 无需重载窗口即可生效 */
+function readLaunchOptions(deployed: DeployedFiles | undefined): QoderLaunchOptions {
+  const config = vscode.workspace.getConfiguration("qoder");
+  return {
+    injectEditorContext: config.get("injectEditorContext", true),
+    launchArgs: sanitizeLaunchArgs(config.get("launchArgs", [])),
+    settingsPath: deployed?.settingsPath,
+    hookPath: deployed?.hookPath,
+  };
+}
+
 function terminalOptions(
-  settingsPath: string,
+  launchArgs: string[],
   qoderPath: string,
   name: string
 ): vscode.TerminalOptions {
@@ -37,19 +55,20 @@ function terminalOptions(
     location: vscode.TerminalLocation.Panel,
     cwd: vscode.workspace.workspaceFolders?.[0]?.uri.fsPath,
     shellPath: qoderPath,
-    shellArgs: ["--settings", settingsPath],
+    shellArgs: launchArgs,
   };
 }
 
 export function registerQoderTerminalProfile(
   context: vscode.ExtensionContext,
-  settingsPath: string | undefined
+  deployed: DeployedFiles | undefined
 ): void {
   const provider: vscode.TerminalProfileProvider = {
     async provideTerminalProfile(
       _token: vscode.CancellationToken
     ): Promise<vscode.TerminalProfile | undefined> {
-      if (settingsPath === undefined) {
+      const launchArgs = buildQoderLaunchArgs(readLaunchOptions(deployed));
+      if (launchArgs === undefined) {
         warnSettingsDeployFailed();
         return undefined;
       }
@@ -58,7 +77,7 @@ export function registerQoderTerminalProfile(
         warnMissingQoder();
         return undefined;
       }
-      return new vscode.TerminalProfile(terminalOptions(settingsPath, qoderPath, nextTerminalName()));
+      return new vscode.TerminalProfile(terminalOptions(launchArgs, qoderPath, nextTerminalName()));
     },
   };
   context.subscriptions.push(vscode.window.registerTerminalProfileProvider("qoder-cli", provider));
@@ -69,8 +88,9 @@ export function registerQoderTerminalProfile(
   );
 }
 
-export async function openQoderTerminal(settingsPath: string | undefined): Promise<void> {
-  if (settingsPath === undefined) {
+export async function openQoderTerminal(deployed: DeployedFiles | undefined): Promise<void> {
+  const launchArgs = buildQoderLaunchArgs(readLaunchOptions(deployed));
+  if (launchArgs === undefined) {
     warnSettingsDeployFailed();
     return;
   }
@@ -85,7 +105,15 @@ export async function openQoderTerminal(settingsPath: string | undefined): Promi
     return;
   }
   const terminal = vscode.window.createTerminal(
-    terminalOptions(settingsPath, qoderPath, nextTerminalName())
+    terminalOptions(launchArgs, qoderPath, nextTerminalName())
   );
   terminal.show();
+}
+
+export function openQoderSettingsFile(deployed: DeployedFiles | undefined): void {
+  if (deployed?.settingsPath === undefined) {
+    warnSettingsDeployFailed();
+    return;
+  }
+  void vscode.window.showTextDocument(vscode.Uri.file(deployed.settingsPath));
 }

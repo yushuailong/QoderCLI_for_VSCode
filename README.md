@@ -110,7 +110,8 @@ that context is prepended to your prompt
 2. It records that window — port, token, workspace folders — in a registry file inside
    the extension's own global storage.
 3. It writes its own `qoder-settings.json` there too, registering a `UserPromptSubmit`
-   hook, and launches the terminal as `qoder --settings <that file>`.
+   hook, and launches the terminal as `qoder --settings <that file>` (customizable —
+   see [Custom launch arguments](#custom-launch-arguments)).
 4. When you submit a prompt, Qoder CLI runs the hook. The hook looks up which VS Code
    window owns the terminal's working directory, fetches the live context over
    localhost, and returns it as additional context for that message.
@@ -128,6 +129,43 @@ Two consequences worth knowing:
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
 | `qoder.executablePath` | string | `""` | Absolute path to the `qoder` executable. When empty, `qoder` is looked up on `PATH`. |
+| `qoder.injectEditorContext` | boolean | `true` | Pass `--settings <deployed settings file>` automatically so editor context is injected. Turn it off if your CLI build rejects `--settings`, or if you load your own settings file via `qoder.launchArgs`. |
+| `qoder.launchArgs` | string[] | `[]` | Extra arguments appended to the launch command, after the automatically injected ones. Supports `${settingsPath}` and `${hookPath}` variables. |
+
+## Custom launch arguments
+
+By default the terminal is launched as `qoder --settings <deployed qoder-settings.json>`.
+If that does not fit your setup — you want your own settings file, extra flags, or a CLI
+build that does not accept `--settings` — you can take control with `qoder.launchArgs`:
+
+```jsonc
+// user or workspace settings.json
+{
+  // start bare, without the injected --settings
+  "qoder.injectEditorContext": false,
+  // ...then compose the command line yourself
+  "qoder.launchArgs": [
+    "--settings", "/home/me/.qoder/my-settings.json",
+    "--verbose"
+  ]
+}
+```
+
+- Arguments from `qoder.launchArgs` come **after** the automatically injected ones. Many
+  CLIs take the last occurrence of a repeated flag, so a `--settings` you add there
+  usually wins — but if your CLI build rejects duplicate flags, set
+  `qoder.injectEditorContext` to `false` to skip the injected file entirely.
+- The variables `${settingsPath}` (the deployed settings file) and `${hookPath}` (the
+  deployed hook script) are expanded in each argument. Example:
+  `"qoder.launchArgs": ["--settings", "${settingsPath}"]`.
+- Settings are read at every launch — no window reload needed.
+
+### Merging the hook into your own settings
+
+If you use your own `--settings` file, copy the hook registration into it so editor
+context keeps working. Run **Qoder CLI: Open Editor Context Settings File** from the
+Command Palette to open the deployed `qoder-settings.json`, then merge its
+`hooks.UserPromptSubmit` entry (which invokes `node "<hookPath>"`) into your file.
 
 ## Remote development (Remote-SSH, containers, WSL)
 
