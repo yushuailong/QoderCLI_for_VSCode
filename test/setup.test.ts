@@ -27,7 +27,8 @@ test("首次部署: 生成 hook 与 qoder-settings，占位符被替换为注册
   assert.equal(settingsPath, join(storageDir, "qoder-settings.json"));
   const hookContent = await readFile(hookPath, "utf8");
   assert.ok(!hookContent.includes("__EDITOR_CONTEXT_REGISTRY__"));
-  assert.ok(hookContent.includes(registryPath));
+  /* 部署时写入的是 JSON.stringify(registryPath), Windows 反斜杠被转义为双写 */
+  assert.ok(hookContent.includes(JSON.stringify(registryPath)));
 
   const settings = JSON.parse(await readFile(settingsPath, "utf8"));
   const hookEntry = settings.hooks.UserPromptSubmit[0].hooks[0];
