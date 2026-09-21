@@ -24,7 +24,7 @@ async function resolveQoderPath(): Promise<string | undefined> {
 
 function warnMissingQoder(): void {
   vscode.window.showWarningMessage(
-    "Qoder CLI Editor Context: qoder executable not found. Please configure qoder.executablePath in settings."
+    "Qoder CLI Editor Context: qodercli (or qoder) executable not found. Please configure qoder.executablePath in settings."
   );
 }
 

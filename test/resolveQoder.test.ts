@@ -22,7 +22,7 @@ test("configuredPath 不存在: 返回 undefined", async () => {
   assert.equal(await resolveQoderExecutable("/nonexistent/qoder"), undefined);
 });
 
-test("未配置时从 PATH 查找", skipOnWindows, async () => {
+test("未配置时从 PATH 查找 qoder 回退名", skipOnWindows, async () => {
   const dir = await mkdtemp(join(tmpdir(), "qoder-"));
   try {
     const bin = join(dir, "qoder");
@@ -35,6 +35,43 @@ test("未配置时从 PATH 查找", skipOnWindows, async () => {
     assert.equal(found, bin);
   } finally {
     await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("未配置时从 PATH 查找 qodercli", skipOnWindows, async () => {
+  const dir = await mkdtemp(join(tmpdir(), "qoder-"));
+  try {
+    const bin = join(dir, "qodercli");
+    await writeFile(bin, "#!/bin/sh\necho hi\n", "utf8");
+    await chmod(bin, 0o755);
+    const found = await resolveQoderExecutable(undefined, {
+      ...process.env,
+      PATH: dir,
+    });
+    assert.equal(found, bin);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("qodercli 优先于更靠前 PATH 目录中的 qoder 分发器", skipOnWindows, async () => {
+  const dir1 = await mkdtemp(join(tmpdir(), "qoder-dispatch-"));
+  const dir2 = await mkdtemp(join(tmpdir(), "qoder-cli-"));
+  try {
+    const dispatcher = join(dir1, "qoder");
+    await writeFile(dispatcher, "#!/bin/sh\n", "utf8");
+    await chmod(dispatcher, 0o755);
+    const cli = join(dir2, "qodercli");
+    await writeFile(cli, "#!/bin/sh\n", "utf8");
+    await chmod(cli, 0o755);
+    const found = await resolveQoderExecutable(undefined, {
+      ...process.env,
+      PATH: [dir1, dir2].join(":"),
+    });
+    assert.equal(found, cli);
+  } finally {
+    await rm(dir1, { recursive: true, force: true });
+    await rm(dir2, { recursive: true, force: true });
   }
 });
 
@@ -97,9 +134,11 @@ test("PATH 中只有 remote-cli shim 时返回 undefined 而非 shim", skipOnWin
   const shimDir = join(root, ".vscode-server", "bin", "abc", "bin", "remote-cli");
   try {
     await mkdir(shimDir, { recursive: true });
-    const shim = join(shimDir, "qoder");
-    await writeFile(shim, "#!/bin/sh\n", "utf8");
-    await chmod(shim, 0o755);
+    for (const name of ["qoder", "qodercli"]) {
+      const shim = join(shimDir, name);
+      await writeFile(shim, "#!/bin/sh\n", "utf8");
+      await chmod(shim, 0o755);
+    }
     assert.equal(
       await resolveQoderExecutable(undefined, { ...process.env, PATH: shimDir }),
       undefined
@@ -113,7 +152,7 @@ test("executableCandidates: Windows 按 PATHEXT 展开候选", async () => {
   const { executableCandidates } = await import("../src/lib/resolveQoder.ts");
   assert.deepEqual(
     executableCandidates(true, { PATHEXT: ".COM;.EXE" }),
-    ["qoder", "qoder.COM", "qoder.EXE"]
+    ["qodercli", "qodercli.COM", "qodercli.EXE", "qoder", "qoder.COM", "qoder.EXE"]
   );
 });
 
@@ -121,19 +160,19 @@ test("executableCandidates: PATHEXT 条目无点前缀时补点", async () => {
   const { executableCandidates } = await import("../src/lib/resolveQoder.ts");
   assert.deepEqual(
     executableCandidates(true, { PATHEXT: "EXE;.BAT" }),
-    ["qoder", "qoder.EXE", "qoder.BAT"]
+    ["qodercli", "qodercli.EXE", "qodercli.BAT", "qoder", "qoder.EXE", "qoder.BAT"]
   );
 });
 
-test("executableCandidates: posix 只返回裸名", async () => {
+test("executableCandidates: posix 只返回裸名且 qodercli 优先", async () => {
   const { executableCandidates } = await import("../src/lib/resolveQoder.ts");
-  assert.deepEqual(executableCandidates(false, {}), ["qoder"]);
+  assert.deepEqual(executableCandidates(false, {}), ["qodercli", "qoder"]);
 });
 
 test("executableCandidates: PATHEXT 空/点/空白条目被过滤", async () => {
   const { executableCandidates } = await import("../src/lib/resolveQoder.ts");
   assert.deepEqual(
     executableCandidates(true, { PATHEXT: ".EXE;;.;  ;.BAT" }),
-    ["qoder", "qoder.EXE", "qoder.BAT"]
+    ["qodercli", "qodercli.EXE", "qodercli.BAT", "qoder", "qoder.EXE", "qoder.BAT"]
   );
 });

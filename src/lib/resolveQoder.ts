@@ -4,18 +4,23 @@ import { delimiter, join, resolve } from "node:path";
 const isWindows = process.platform === "win32";
 
 /**
- * Expand "qoder" into the candidate file names to look for in each PATH
- * directory. On Windows this mirrors `where` by appending every PATHEXT
- * extension; elsewhere it is just the literal name.
+ * CLI 可执行文件名候选。`qodercli` 是 CLI 的正式安装名（~/.local/bin/qodercli），
+ * 优先匹配；`qoder` 是 qodercli 安装的命令分发器（~/.qoder/entry/qoder，把调用
+ * 路由到 CLI 或 IDE），作为回退。
+ * On Windows this mirrors `where` by appending every PATHEXT extension.
  */
 export function executableCandidates(isWindows: boolean, env: NodeJS.ProcessEnv): string[] {
-  if (!isWindows) return ["qoder"];
+  const names = ["qodercli", "qoder"];
+  if (!isWindows) return names;
   const pathext = env.PATHEXT ?? ".COM;.EXE;.BAT;.CMD";
   const exts = pathext
     .split(";")
     .map((e) => e.trim())
     .filter((e) => e !== "" && e !== ".");
-  return ["qoder", ...exts.map((ext) => (ext.startsWith(".") ? `qoder${ext}` : `qoder.${ext}`))];
+  return names.flatMap((name) => [
+    name,
+    ...exts.map((ext) => (ext.startsWith(".") ? `${name}${ext}` : `${name}.${ext}`)),
+  ]);
 }
 
 // 注：Windows 上 X_OK 等价于存在性检查（Node 语义），与 where 行为一致
@@ -52,10 +57,12 @@ export async function resolveQoderExecutable(
   // Search PATH natively instead of spawning `which`/`where`: child_process
   // resolves the tool itself against the injected env's PATH, so a test env
   // whose PATH only contains a temp dir makes spawning `which` fail outright.
+  // 候选名在外层循环：qodercli 在所有 PATH 目录中优先于任何目录下的 qoder，
+  // 避免把 IDE 启动器（如 /usr/local/bin/qoder 符号链接）当成 CLI。
   // 空条目按未设置处理（不视为 cwd，防御性选择）
   const dirs = (env.PATH ?? "").split(delimiter).filter((d) => d !== "");
-  for (const dir of dirs) {
-    for (const name of executableCandidates(isWindows, env)) {
+  for (const name of executableCandidates(isWindows, env)) {
+    for (const dir of dirs) {
       const candidate = resolve(join(dir, name));
       if (isRemoteCliShim(candidate)) continue;
       if (await isExecutableFile(candidate)) return candidate;

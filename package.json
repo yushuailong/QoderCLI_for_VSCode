@@ -57,7 +57,7 @@
         "qoder.executablePath": {
           "type": "string",
           "default": "",
-          "markdownDescription": "Absolute path to the qoder executable. When left empty, qoder is looked up automatically from `PATH`."
+          "markdownDescription": "Absolute path to the CLI executable. When left empty, `qodercli` is looked up automatically from `PATH` first, then the `qoder` dispatcher."
         },
         "qoder.injectEditorContext": {
           "type": "boolean",
