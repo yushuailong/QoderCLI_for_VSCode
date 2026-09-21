@@ -32,7 +32,7 @@ Qoder CLI 是终端里的智能体，本身并不知道你的编辑器在做什�
 | 项目 | 说明 |
 | --- | --- |
 | VS Code | 1.85 及以上 |
-| `qodercli` | 已安装 Qoder CLI 且在 `PATH` 上（`qodercli` 或 `qoder` 分发器均可），或配置 `qoder.executablePath` |
+| `qodercli` | 已安装 Qoder CLI：在 `PATH` 上（`qodercli` 或 `qoder` 分发器均可）或位于默认安装位置；也可配置 `qoder.executablePath` |
 | `node` | 在 `PATH` 上——用于运行上下文 hook |
 | 工作区 | 需要打开一个文件夹；上下文按工作区文件夹匹配 |
 
@@ -119,7 +119,7 @@ hook 用终端的工作目录匹配到对应的 VS Code 窗口（windows.json）
 
 | 配置项 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| `qoder.executablePath` | string | `""` | CLI 可执行文件的绝对路径。留空时先在 `PATH` 上找 `qodercli`，再回退到 `qoder` 分发器。 |
+| `qoder.executablePath` | string | `""` | CLI 可执行文件的绝对路径。留空时先在 `PATH` 上找 `qodercli`，再回退到 `qoder` 分发器，最后探测默认安装位置（`~/.local/bin/qodercli`、`~/.qoder/bin/qodercli/qodercli`、`~/.qoder/entry/qoder`）——标准安装无需任何配置。 |
 | `qoder.injectEditorContext` | boolean | `true` | 自动附加 `--settings <部署的 settings 文件>` 以注入编辑器上下文。CLI 版本不支持 `--settings` 或想加载自己的 settings 文件时关闭。 |
 | `qoder.launchArgs` | string[] | `[]` | 追加到启动命令末尾的额外参数（位于自动注入的参数之后）。支持 `${settingsPath}`、`${hookPath}` 变量。 |
 
@@ -167,10 +167,11 @@ hook 用终端的工作目录匹配到对应的 VS Code 窗口（windows.json）
 
 ## 排查问题
 
-**提示 "qodercli (or qoder) executable not found"**——安装 Qoder CLI，或把 `qoder.executablePath`
-设为它的绝对路径。查找顺序是先 `qodercli` 后 `qoder`；注意 `PATH` 上名为 `qoder` 的
-IDE 启动器（如残留的 `/usr/local/bin/qoder` 符号链接）不会被当成 CLI 使用。
-注意 VS Code 继承的是启动时的 `PATH`，改完 shell 配置需要重启 VS Code。
+**提示 "qodercli/qoder executable not found"**——安装 Qoder CLI，或把 `qoder.executablePath`
+设为它的绝对路径。查找顺序是先 `qodercli` 后 `qoder`，最后探测默认安装位置
+（`~/.local/bin/qodercli`、`~/.qoder/bin/qodercli/qodercli`、`~/.qoder/entry/qoder`），
+标准安装零配置可用；`PATH` 上名为 `qoder` 的 IDE 启动器（如残留的 `/usr/local/bin/qoder`
+符号链接）不会被当成 CLI 使用。
 
 **智能体那边看不到上下文块**——检查：
 

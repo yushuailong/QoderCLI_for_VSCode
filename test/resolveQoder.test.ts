@@ -75,15 +75,21 @@ test("qodercli 优先于更靠前 PATH 目录中的 qoder 分发器", skipOnWind
   }
 });
 
-test("PATH 中也没有: 返回 undefined", skipOnWindows, async () => {
+test("PATH 中也没有且回退位置为空: 返回 undefined", skipOnWindows, async () => {
   const emptyDir = await mkdtemp(join(tmpdir(), "empty-"));
+  const emptyHome = await mkdtemp(join(tmpdir(), "empty-home-"));
   try {
     assert.equal(
-      await resolveQoderExecutable(undefined, { ...process.env, PATH: emptyDir }),
+      await resolveQoderExecutable(undefined, {
+        ...process.env,
+        PATH: emptyDir,
+        HOME: emptyHome,
+      }),
       undefined
     );
   } finally {
     await rm(emptyDir, { recursive: true, force: true });
+    await rm(emptyHome, { recursive: true, force: true });
   }
 });
 
@@ -129,9 +135,10 @@ test("PATH 前部命中远程 server 的 remote-cli shim 时跳过，继续找�
   }
 });
 
-test("PATH 中只有 remote-cli shim 时返回 undefined 而非 shim", skipOnWindows, async () => {
+test("PATH 中只有 remote-cli shim 且默认位置为空: 返回 undefined 而非 shim", skipOnWindows, async () => {
   const root = await mkdtemp(join(tmpdir(), "qoder-shimonly-"));
   const shimDir = join(root, ".vscode-server", "bin", "abc", "bin", "remote-cli");
+  const emptyHome = await mkdtemp(join(tmpdir(), "empty-home-"));
   try {
     await mkdir(shimDir, { recursive: true });
     for (const name of ["qoder", "qodercli"]) {
@@ -140,11 +147,104 @@ test("PATH 中只有 remote-cli shim 时返回 undefined 而非 shim", skipOnWin
       await chmod(shim, 0o755);
     }
     assert.equal(
-      await resolveQoderExecutable(undefined, { ...process.env, PATH: shimDir }),
+      await resolveQoderExecutable(undefined, {
+        ...process.env,
+        PATH: shimDir,
+        HOME: emptyHome,
+      }),
       undefined
     );
   } finally {
     await rm(root, { recursive: true, force: true });
+    await rm(emptyHome, { recursive: true, force: true });
+  }
+});
+
+test("PATH 只有 remote-cli shim 时回退到 HOME 下的真实 CLI（远程场景）", skipOnWindows, async () => {
+  const root = await mkdtemp(join(tmpdir(), "qoder-shimhome-"));
+  const shimDir = join(root, ".qoder-server", "bin", "e7b4", "bin", "remote-cli");
+  const home = await mkdtemp(join(tmpdir(), "fake-home-"));
+  try {
+    await mkdir(shimDir, { recursive: true });
+    const shim = join(shimDir, "qoder");
+    await writeFile(shim, "#!/bin/sh\n", "utf8");
+    await chmod(shim, 0o755);
+    const cli = join(home, ".local", "bin", "qodercli");
+    await mkdir(join(home, ".local", "bin"), { recursive: true });
+    await writeFile(cli, "#!/bin/sh\n", "utf8");
+    await chmod(cli, 0o755);
+    const found = await resolveQoderExecutable(undefined, {
+      ...process.env,
+      PATH: shimDir,
+      HOME: home,
+    });
+    assert.equal(found, cli);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+    await rm(home, { recursive: true, force: true });
+  }
+});
+
+test("PATH 找不到时回退到默认安装位置 ~/.local/bin/qodercli", async () => {
+  const emptyDir = await mkdtemp(join(tmpdir(), "empty-"));
+  const home = await mkdtemp(join(tmpdir(), "fake-home-"));
+  try {
+    const cli = join(home, ".local", "bin", "qodercli");
+    await mkdir(join(home, ".local", "bin"), { recursive: true });
+    await writeFile(cli, "#!/bin/sh\n", "utf8");
+    await chmod(cli, 0o755);
+    const found = await resolveQoderExecutable(undefined, {
+      ...process.env,
+      PATH: emptyDir,
+      HOME: home,
+    });
+    assert.equal(found, cli);
+  } finally {
+    await rm(emptyDir, { recursive: true, force: true });
+    await rm(home, { recursive: true, force: true });
+  }
+});
+
+test("回退链: ~/.local/bin 与 ~/.qoder/bin 缺失时用 ~/.qoder/entry/qoder", async () => {
+  const emptyDir = await mkdtemp(join(tmpdir(), "empty-"));
+  const home = await mkdtemp(join(tmpdir(), "fake-home-"));
+  try {
+    const dispatcher = join(home, ".qoder", "entry", "qoder");
+    await mkdir(join(home, ".qoder", "entry"), { recursive: true });
+    await writeFile(dispatcher, "#!/bin/sh\n", "utf8");
+    await chmod(dispatcher, 0o755);
+    const found = await resolveQoderExecutable(undefined, {
+      ...process.env,
+      PATH: emptyDir,
+      HOME: home,
+    });
+    assert.equal(found, dispatcher);
+  } finally {
+    await rm(emptyDir, { recursive: true, force: true });
+    await rm(home, { recursive: true, force: true });
+  }
+});
+
+test("PATH 命中优先于默认安装位置", async () => {
+  const binDir = await mkdtemp(join(tmpdir(), "pathbin-"));
+  const home = await mkdtemp(join(tmpdir(), "fake-home-"));
+  try {
+    const onPath = join(binDir, "qodercli");
+    await writeFile(onPath, "#!/bin/sh\n", "utf8");
+    await chmod(onPath, 0o755);
+    const fallback = join(home, ".local", "bin", "qodercli");
+    await mkdir(join(home, ".local", "bin"), { recursive: true });
+    await writeFile(fallback, "#!/bin/sh\n", "utf8");
+    await chmod(fallback, 0o755);
+    const found = await resolveQoderExecutable(undefined, {
+      ...process.env,
+      PATH: binDir,
+      HOME: home,
+    });
+    assert.equal(found, onPath);
+  } finally {
+    await rm(binDir, { recursive: true, force: true });
+    await rm(home, { recursive: true, force: true });
   }
 });
 

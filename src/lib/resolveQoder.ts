@@ -3,6 +3,23 @@ import { delimiter, join, resolve } from "node:path";
 
 const isWindows = process.platform === "win32";
 
+// Windows 上按 PATHEXT 为候选补全扩展名；posix 原样返回
+function expandWindowsExtensions(
+  isWindows: boolean,
+  env: NodeJS.ProcessEnv,
+  bases: string[]
+): string[] {
+  if (!isWindows) return bases;
+  const exts = (env.PATHEXT ?? ".COM;.EXE;.BAT;.CMD")
+    .split(";")
+    .map((e) => e.trim())
+    .filter((e) => e !== "" && e !== ".");
+  return bases.flatMap((base) => [
+    base,
+    ...exts.map((ext) => (ext.startsWith(".") ? `${base}${ext}` : `${base}.${ext}`)),
+  ]);
+}
+
 /**
  * CLI 可执行文件名候选。`qodercli` 是 CLI 的正式安装名（~/.local/bin/qodercli），
  * 优先匹配；`qoder` 是 qodercli 安装的命令分发器（~/.qoder/entry/qoder，把调用
@@ -10,17 +27,7 @@ const isWindows = process.platform === "win32";
  * On Windows this mirrors `where` by appending every PATHEXT extension.
  */
 export function executableCandidates(isWindows: boolean, env: NodeJS.ProcessEnv): string[] {
-  const names = ["qodercli", "qoder"];
-  if (!isWindows) return names;
-  const pathext = env.PATHEXT ?? ".COM;.EXE;.BAT;.CMD";
-  const exts = pathext
-    .split(";")
-    .map((e) => e.trim())
-    .filter((e) => e !== "" && e !== ".");
-  return names.flatMap((name) => [
-    name,
-    ...exts.map((ext) => (ext.startsWith(".") ? `${name}${ext}` : `${name}.${ext}`)),
-  ]);
+  return expandWindowsExtensions(isWindows, env, ["qodercli", "qoder"]);
 }
 
 // 注：Windows 上 X_OK 等价于存在性检查（Node 语义），与 where 行为一致
@@ -41,6 +48,22 @@ async function isExecutableFile(path: string): Promise<boolean> {
 function isRemoteCliShim(path: string): boolean {
   const segments = path.split(/[\\/]+/);
   return segments.includes("remote-cli") && segments.some((s) => s.endsWith("-server"));
+}
+
+/**
+ * PATH 之外的默认安装位置（qodercli 官方安装器布局，优先级从高到低，
+ * 与 qoder 分发器 _find_cli 的回退链一致）。GUI 方式启动的 VS Code 不加载
+ * shell 配置，扩展宿主的 PATH 里往往没有这些目录，因此在 PATH 搜索失败后
+ * 按绝对路径兜底，保证零配置可用。
+ */
+export function wellKnownCandidates(isWindows: boolean, env: NodeJS.ProcessEnv): string[] {
+  const home = env.HOME ?? env.USERPROFILE;
+  if (!home) return [];
+  return expandWindowsExtensions(isWindows, env, [
+    join(home, ".local", "bin", "qodercli"),
+    join(home, ".qoder", "bin", "qodercli", "qodercli"),
+    join(home, ".qoder", "entry", "qoder"),
+  ]);
 }
 
 export async function resolveQoderExecutable(
@@ -67,6 +90,10 @@ export async function resolveQoderExecutable(
       if (isRemoteCliShim(candidate)) continue;
       if (await isExecutableFile(candidate)) return candidate;
     }
+  }
+  // 兜底：默认安装位置（GUI 启动的窗口 PATH 缺失这些目录，零配置仍可找到）
+  for (const candidate of wellKnownCandidates(isWindows, env)) {
+    if (await isExecutableFile(candidate)) return candidate;
   }
   return undefined;
 }

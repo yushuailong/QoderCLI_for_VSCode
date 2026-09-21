@@ -34,7 +34,7 @@ you, automatically, every time.
 | Requirement | Details |
 | --- | --- |
 | VS Code | 1.85 or newer |
-| `qodercli` | Qoder CLI installed and on your `PATH` (as `qodercli` or the `qoder` dispatcher), or set `qoder.executablePath` |
+| `qodercli` | Qoder CLI installed on your `PATH` (as `qodercli` or the `qoder` dispatcher) or at a default install location; or set `qoder.executablePath` |
 | `node` | On your `PATH` — used to run the context hook |
 | Workspace | A folder must be open; context is matched per workspace folder |
 
@@ -128,7 +128,7 @@ Two consequences worth knowing:
 
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
-| `qoder.executablePath` | string | `""` | Absolute path to the CLI executable. When empty, `qodercli` is looked up on `PATH` first, then the `qoder` dispatcher. |
+| `qoder.executablePath` | string | `""` | Absolute path to the CLI executable. When empty, `qodercli` is looked up on `PATH` first, then the `qoder` dispatcher, then default install locations (`~/.local/bin/qodercli`, `~/.qoder/bin/qodercli/qodercli`, `~/.qoder/entry/qoder`) — no configuration needed for a standard install. |
 | `qoder.injectEditorContext` | boolean | `true` | Pass `--settings <deployed settings file>` automatically so editor context is injected. Turn it off if your CLI build rejects `--settings`, or if you load your own settings file via `qoder.launchArgs`. |
 | `qoder.launchArgs` | string[] | `[]` | Extra arguments appended to the launch command, after the automatically injected ones. Supports `${settingsPath}` and `${hookPath}` variables. |
 
@@ -179,11 +179,12 @@ The extension runs on the workspace side, so it works in remote sessions:
 
 ## Troubleshooting
 
-**"qodercli (or qoder) executable not found"** — install Qoder CLI, or set `qoder.executablePath`
-to its absolute path. Lookup tries `qodercli` first, then `qoder`; a `qoder` PATH entry that is
-actually an IDE launcher (e.g. a stale `/usr/local/bin/qoder` symlink) is never picked.
-Remember that VS Code inherits the `PATH` it was launched with;
-after editing your shell profile, restart VS Code.
+**"qodercli/qoder executable not found"** — install Qoder CLI, or set `qoder.executablePath`
+to its absolute path. Lookup tries `qodercli` first, then `qoder`, then default install
+locations (`~/.local/bin/qodercli`, `~/.qoder/bin/qodercli/qodercli`, `~/.qoder/entry/qoder`),
+so a standard install works with no configuration even in windows launched from the Dock;
+a `qoder` PATH entry that is actually an IDE launcher (e.g. a stale `/usr/local/bin/qoder`
+symlink) is never picked.
 
 **No context block appears in the agent's view** — check that:
 
